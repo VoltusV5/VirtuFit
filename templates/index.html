@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VirtualFit</title>
+        <link 
+                rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+
+        <link rel="stylesheet" href="../static/css/main-page-styles.css">
+        <link rel="stylesheet" href="../static/css/index-styles.css">
+
+
+        <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+        <!-- Для загрузки моделей -->
+        <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+        <!-- Для OrbitControls -->
+        <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+
+    </head>
+    <body>
+        <div class="container">
+            <h1>Введите ваши параметры</h1>
+            <form id="measurements-form">
+                <!-- Основные параметры -->
+                <div class="form-group">
+                    <label for="gender">Пол:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="male">Мужской</option>
+                        <option value="female">Женский</option>
+                    </select>
+                </div>
+    
+                <div class="form-group">
+                    <label for="chest">Обхват груди (см):</label>
+                    <input type="number" id="chest" name="chest" min="50" max="150" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="waist">Талия (см):</label>
+                    <input type="number" id="waist" name="waist" min="40" max="120" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="hips">Бёдра (см):</label>
+                    <input type="number" id="hips" name="hips" min="50" max="150" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="shoulders">Ширина плеч (см):</label>
+                    <input type="number" id="shoulders" name="shoulders" min="30" max="60" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="height">Рост (см):</label>
+                    <input type="number" id="height" name="height" min="140" max="220" required>
+                </div>
+    
+                
+                <div class="form-group">
+                    <label for="bust">Размер груди (см):</label>
+                    <input type="number" id="bust" name="bust" min="50" max="150">
+                </div>
+
+                <div class="form-group">
+                    <label for="neck">Шея (см):</label>
+                    <input type="number" id="neck" name="neck" min="20" max="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Вес (кг):</label>
+                    <input type="number" id="weight" name="weight" min="30" max="150">
+                </div>
+
+                <div class="form-group">
+                    <label for="arm_length">Длина рук (см):</label>
+                    <input type="number" id="arm_length" name="arm_length" min="40" max="90">
+                </div>
+                
+                <button type="submit" onclick="submitForm()" class="submit-btn">Отправить</button>
+            </form>
+
+            <div id="model-container" style="width: 100%; height: 500px;"></div>
+        </div>
+            
+
+        <script src="{{ url_for('static', filename='scripts/scripts.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts/3d-viewer.js') }}"></script>
+        
+    </body>
+</html>
