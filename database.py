@@ -1,3 +1,4 @@
+from sqlalchemy import Column, create_engine, Integer, Boolean,String,Float
 from sqlalchemy import Column, create_engine, Integer, Boolean
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -18,6 +19,15 @@ class Person(Base):
         index=True
         )
     photo = Column(Boolean)
+    gender = Column(String ) #Пол
+    chest = Column(Integer ) #Обхват груди
+    hips = Column(Integer ) #Бёдра
+    height = Column(Integer) #Рост
+    chest_girl = Column(Integer ) # Размер груди
+    neck = Column(Integer ) #Шея
+    massa = Column(Float )
+    len_arm = Column(Integer ) #Длинна рук
+
 
 SessionLocal = sessionmaker(autoflush=False,bind=engine)
 
