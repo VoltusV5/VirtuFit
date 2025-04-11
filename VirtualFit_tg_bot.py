@@ -323,6 +323,9 @@ async def photo_processing(message: Message):
 async def answer(ms:Message):
     await ms.answer("Хорошо, давай примерим!!!\n\nОтправь мне фото одежды, которую хотел бы примерить!")
 
+@dp.message(F.text == "Что умеешь?", StateFilter(default_state))
+async def info(ms:Message):
+    await ms.answer("Привет! Я бот VirtualFit.\n\nЯ могу помочь тебе примерить одежду.\nСначала введи свои размеры, потом сможешь отправить мне фотографию той одежды, которую хочешь примерить, а я пришлю тебе видео на которой модель с твоими размерами в этой одежде!")
 
 @dp.message(F.text == "Футболка", StateFilter(default_state))
 async def t_short(message: Message):
@@ -348,3 +351,56 @@ async def other_message(message:Message):
 
 if __name__=='__main__':
     dp.run_polling(bot)
+
+
+
+
+# # import bpy
+# import sys
+
+# def main():
+#     argv = sys.argv[sys.argv.index("--") + 1:]
+#     dimensions = list(map(float, argv[0].split(',')))
+#     output_path = argv[1]
+    
+#     # Получаем объект модели
+#     obj = bpy.data.objects['Body']
+    
+#     # Изменяем размеры (пример для параметрической модели)
+#     obj.dimensions = dimensions
+    
+#     # Настройка рендера
+#     bpy.context.scene.render.filepath = output_path
+#     bpy.ops.render.render(write_still=True)
+
+# if __name__ == "__main__":
+#     main()
+
+# async def run_blender_script(user_id, dimensions):
+#     output_path = f"renders/{user_id}_output.png"
+#     blender_script = "model_adjust.py"
+    
+#     proc = await asyncio.create_subprocess_exec(
+#         "blender", "-b", "model.blend", 
+#         "-P", blender_script,
+#         "--", dimensions, output_path,
+#         stdout=asyncio.subprocess.PIPE,
+#         stderr=asyncio.subprocess.PIPE
+#     )
+    
+#     await proc.wait()
+#     return output_path
+
+# @dp.message_handler(regexp=r'\d+,\s*\d+,\s*\d+')
+# async def process_dimensions(message: types.Message):
+#     user_id = message.from_user.id
+#     try:
+#         await message.answer("Начинаю обработку...")
+#         output = await run_blender_script(user_id, message.text)
+        
+#         with open(output, 'rb') as photo:
+#             await message.answer_photo(photo)
+        
+#         os.remove(output)  # Очистка временных файлов
+#     except Exception as e:
+#         await message.answer(f"Ошибка: {str(e)}")
