@@ -1,2 +1,3 @@
 myvenv
 .env
+app_sql.db

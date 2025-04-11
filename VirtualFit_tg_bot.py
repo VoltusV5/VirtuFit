@@ -39,7 +39,9 @@ buttons_menu = [KeyboardButton(text="Подписка"),
                 KeyboardButton(text="Что умеешь?"), 
                 KeyboardButton(text="Примерить одежду"),
                 KeyboardButton(text="Реферальная программа"),
-                KeyboardButton(text="Сотрудничество")]
+                KeyboardButton(text="Сотрудничество"),
+                KeyboardButton(text="Мои размеры")
+                ]
 kb_builder1.row(*buttons_1, width=2)
 kb_builder_menu.row(*buttons_menu, width=3)
 
@@ -195,7 +197,7 @@ async def height_error(ms:Message):
 @dp.message(StateFilter(FSMform.neck), control_values)
 async def neck_done(ms:Message, state: FSMContext):
     await state.update_data(neck=int(ms.text))
-    await ms.answer("Отлично!\nТеперь введите вес в САНТИМЕТРАХ (см)")
+    await ms.answer("Отлично!\nТеперь введите вес в КИЛЛОГРАММАХ (кг)")
     await state.set_state(FSMform.massa)
 
 @dp.message(StateFilter(FSMform.neck))
@@ -212,58 +214,89 @@ async def massa_done(ms:Message, state: FSMContext):
 async def massa_error(ms:Message):
      await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
  
-@dp.message(StateFilter(FSMform.len_arm), lambda x: int(x.text)>20 and int(x.text)<90 and x.text.isdigit(),StateFilter(FSMform.gender=='male'))
-async def len_arm_done1(ms:Message, state: FSMContext):
+@dp.message(StateFilter(FSMform.len_arm), lambda x: int(x.text)>20 and int(x.text)<90 and x.text.isdigit())
+async def len_arm_done(ms:Message, state: FSMContext):
     await state.update_data(len_arm=float(ms.text))
-    await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!")
-    db = get_db()
-    person = db.query(Person).filter(Person.id==ms.from_user.id).first()
-    person.gender = await state.get_data()['gender']
-    person.chest = await state.get_data()['chest']
-    person.waist = await state.get_data()['waist']
-    person.hips = await state.get_data()['hips']
-    person.shoulder_width = await state.get_data()['shoulder_width']
-    person.height = await state.get_data()['height']
-    person.neck = await state.get_data()['neck']
-    person.massa = await state.get_data()['massa']
-    person.len_arm = await state.get_data()['len_arm']
-    db.commit()
-    db.close()
-    state.clear()
-
-@dp.message(StateFilter(FSMform.len_arm), StateFilter(FSMform.gender=='female'), lambda x: int(x.text)>20 and int(x.text)<90 and x.text.isdigit(),StateFilter(FSMform.gender=='male'))
-async def len_arm_done2(ms:Message, state:FSMContext):
-    await state.update_data(len_arm=int(ms.text))
-    await ms.answer("Почти всё, осталось ввести размер груди)")
-    await state.set_state(FSMform.chest_girl)
     
+    db = get_db()
+    data = await state.get_data()
+    if data.get('gender') == 'male':
+        await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!")
+        person = db.query(Person).filter(Person.id==ms.from_user.id).first()
+        person.gender = data.get('gender')
+        person.chest = data.get('chest')
+        person.waist = data.get('waist')
+        person.hips = data.get('hips')
+        person.shoulder_width = data.get('shoulder_width')
+        person.height = data.get('height')
+        person.neck = data.get('neck')
+        person.massa = data.get('massa')
+        person.len_arm = data.get('len_arm')
+        db.commit()
+        db.close()
+        await state.clear()
+    else:
+        await ms.answer("Отлично!!! Осталось ввести последний параметр. \n Введите размер груди.")
+        await state.set_state(FSMform.chest_girl)
+
   
 @dp.message(StateFilter(FSMform.len_arm))
 async def massa_error(ms:Message):
     await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
 
-@dp.message(StateFilter(FSMform.chest_girl), lambda x: 1<=int(x.text)< 5)
+@dp.message(StateFilter(FSMform.chest_girl), lambda x: 1<=int(x.text)<= 5)
 async def chest_girl(ms:Message, state:FSMContext):
     await state.update_data(chest_girl=int(ms.text))
-    await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!")
+    await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!\n\n" \
+    "Свои размеры вы можете увидеть, нажав на кнопку <Мои размеры>")
     db = get_db()
+    data = await state.get_data()
     person = db.query(Person).filter(Person.id==ms.from_user.id).first()
-    person.gender = await state.get_data()['gender']
-    person.chest = await state.get_data()['chest']
-    person.waist = await state.get_data()['waist']
-    person.hips = await state.get_data()['hips']
-    person.shoulder_width = await state.get_data()['shoulder_width']
-    person.height = await state.get_data()['height']
-    person.neck = await state.get_data()['neck']
-    person.massa = await state.get_data()['massa']
-    person.len_arm = await state.get_data()['len_arm']
-    person.chest_girl = await state.get_data()['chest_girl']
+    person.gender = data.get('gender')
+    person.chest = data.get('chest')
+    person.waist = data.get('waist')
+    person.hips = data.get('hips')
+    person.shoulder_width = data.get('shoulder_width')
+    person.height = data.get('height')
+    person.neck = data.get('neck')
+    person.massa = data.get('massa')
+    person.len_arm = data.get('len_arm')
+    person.chest_girl = data.get('chest_girl')
     db.commit()
     db.close()
-    state.clear()
+    await state.clear()
 
 
-#@dp.message(F.text=="Мои размеры")
+@dp.message(F.text=="Мои размеры", StateFilter(default_state))
+async def size_person(ms:Message):
+    db = get_db()
+    person = db.get(Person, ms.from_user.id)
+    if person.chest_girl != None:
+        await ms.answer(
+            f'Пол: Женский\n'
+            f'Обхват груди: {person.chest} см\n'
+            f'Талия: {person.waist} см\n'
+            f'Бёдра: {person.hips} см\n'
+            f'Ширина плечь: {person.shoulder_width} см\n'
+            f'Рост: {person.height} см\n'
+            f'Размер груди: {person.chest_girl}\n'
+            f'Шея: {person.neck} см\n'
+            f'Масса: {person.massa} кг\n'
+            f'Длинна рук: {person.len_arm} см'
+            )
+    else:
+        await ms.answer(
+            f'Пол: Мужской\n'
+            f'Обхват груди: {person.chest} см\n'
+            f'Талия: {person.waist} см\n'
+            f'Бёдра: {person.hips} см\n'
+            f'Ширина плечь: {person.shoulder_width} см\n'
+            f'Рост: {person.height} см\n'
+            f'Шея: {person.neck} см\n'
+            f'Масса: {person.massa} кг\n'
+            f'Длинна рук: {person.len_arm} см'
+            )
+    db.close()
 
 
 #Основная функция вот тут будет всё происходить с блендером...
@@ -285,6 +318,10 @@ async def photo_processing(message: Message):
                          reply_markup= kb_builder1.as_markup(resize_keyboard=True, one_time_keyboard=True))
     await message.answer(text="Какая одежда изображена на фото?",
                          reply_markup= kb_builder.as_markup(resize_keyboard=True, one_time_keyboard=True))
+
+@dp.message(F.text=="Примерить одежду", StateFilter(default_state))
+async def answer(ms:Message):
+    await ms.answer("Хорошо, давай примерим!!!\n\nОтправь мне фото одежды, которую хотел бы примерить!")
 
 
 @dp.message(F.text == "Футболка", StateFilter(default_state))
