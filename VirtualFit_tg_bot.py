@@ -1,15 +1,22 @@
 from aiogram import Bot, Dispatcher, F
+import asyncio
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state,State,StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from aiogram.types import Message, KeyboardButton, BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import Message, KeyboardButton, BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile
 from dotenv import load_dotenv 
 from sqlalchemy.orm import Session
+import time
 from database import *
 import os
 
+#def control(message: Message, state: FSMContext):
+#     data = state.get_data()
+#     if data.get('chest') != None and data.get('waist') != None:
+#         return 10<int(message.text)<100
+        
 def control_values(message: Message):
     return int(message.text)>0 and message.text.isdigit() and message.text not in '.,'
 
@@ -271,7 +278,7 @@ async def chest_girl(ms:Message, state:FSMContext):
 async def size_person(ms:Message):
     db = get_db()
     person = db.get(Person, ms.from_user.id)
-    if person.chest_girl != None:
+    if person.gender == 'female':
         await ms.answer(
             f'Пол: Женский\n'
             f'Обхват груди: {person.chest} см\n'
@@ -319,9 +326,85 @@ async def photo_processing(message: Message):
     await message.answer(text="Какая одежда изображена на фото?",
                          reply_markup= kb_builder.as_markup(resize_keyboard=True, one_time_keyboard=True))
 
+
+
+BLENDER_EXECUTABLE = r'C:\Program Files\Blender 4.4\blender.exe'  # Путь к Blender
+BLENDER_SCRIPT = 'blender_script.py'  # Путь к вашему скрипту
+RENDER_OUTPUT_DIR = 'renders'  # Директория для временных файлов
+
+
+async def run_blender_async(output_path: str) -> bool:
+    """Асинхронно запускает Blender с указанным скриптом"""
+    command = [
+        BLENDER_EXECUTABLE,
+        '--background',
+        '--python', BLENDER_SCRIPT,
+        '--',  # Разделитель для аргументов скрипта
+        output_path
+    ]
+    
+    process = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    
+    await process.communicate()
+    return process.returncode == 0
+
+
+def is_file_available(filepath: str) -> bool:
+    try:
+        with open(filepath, 'rb'):
+            return True
+    except IOError:
+        return False
+
+
 @dp.message(F.text=="Примерить одежду", StateFilter(default_state))
-async def answer(ms:Message):
-    await ms.answer("Хорошо, давай примерим!!!\n\nОтправь мне фото одежды, которую хотел бы примерить!")
+async def answer(message:Message):
+    """Обработчик команды запуска рендеринга"""
+    # Создаем уникальное имя файла
+    os.makedirs(RENDER_OUTPUT_DIR, exist_ok=True)
+    filename = f"{message.from_user.id}.mp4"
+    output_dir = 'D:\\project\\VirtuFit\\video'
+    output_path = os.path.join(output_dir, filename)
+    
+    await message.reply("🚀 Начинаю рендеринг...")
+    
+    try:
+        success = await run_blender_async(output_path)
+        if not success:
+            raise Exception("Ошибка в процессе рендеринга")
+        
+
+        for _ in range(10):
+            if os.path.exists(output_path) and is_file_available(output_path):
+                break
+            await asyncio.sleep(1)
+        else:
+            raise Exception("Файл не освободился после рендеринга")
+        
+
+        if os.path.exists(output_path):
+            video = FSInputFile(output_path)
+            await bot.send_video(
+                chat_id=message.chat.id, 
+                video=video
+                                 )
+            os.remove(output_path)
+        else:
+            await message.reply("❌ Файл не был создан")
+            
+    except Exception as e:
+        await message.reply(f"⚠️ Ошибка: {str(e)}")
+        if os.path.exists(output_path):
+            os.remove(output_path)
+
+
+
+
+
 
 @dp.message(F.text == "Что умеешь?", StateFilter(default_state))
 async def info(ms:Message):
@@ -375,6 +458,13 @@ if __name__=='__main__':
 
 # if __name__ == "__main__":
 #     main()
+
+
+
+
+
+
+
 
 # async def run_blender_script(user_id, dimensions):
 #     output_path = f"renders/{user_id}_output.png"
