@@ -12,10 +12,47 @@ import time
 from database import *
 import os
 
-#def control(message: Message, state: FSMContext):
-#     data = state.get_data()
-#     if data.get('chest') != None and data.get('waist') != None:
-#         return 10<int(message.text)<100
+def control(message: Message, state: FSMContext):
+     data = state.get_data()
+     if data.get('gender') != None and data.get('gender') == 'male':
+         if data.get('chest') != None:
+            return 80<int(message.text)<130
+         if data.get('waist') != None:
+             return 70<int(message.text)<120
+         if data.get('hips') != None:
+             return 85<int(message.text)<130
+         if data.get('shoulder_width') != None:
+             return 25<int(message.text)<50
+         if data.get('height') != None:
+             return 90<int(message.text)<210
+         if data.get('neck') != None:
+             return 32<int(message.text)<50
+         if data.get('massa') != None:
+             return 12<int(message.text)<200
+         if data.get('len_arm') != None:
+             return 40<int(message.text)<80
+     else:
+         if data.get('gender') != None:
+            if data.get('chest') != None:
+                return 85<int(message.text)<130
+            if data.get('waist') != None:
+                return 60<int(message.text)<95
+            if data.get('hips') != None:
+                return 90<int(message.text)<135
+            if data.get('shoulder_width') != None:
+                return 10<int(message.text)<40
+            if data.get('height') != None:
+                return 90<int(message.text)<185
+            if data.get('chest_girl') != None:
+                return 70<int(message.text)<105
+            if data.get('neck') != None:
+                return 27<int(message.text)<42
+            if data.get('massa') != None:
+                return 12<int(message.text)<200
+            if data.get('len_arm') != None:
+                return 35<int(message.text)<75  
+              
+         
         
 def control_values(message: Message):
     return int(message.text)>0 and message.text.isdigit() and message.text not in '.,'
