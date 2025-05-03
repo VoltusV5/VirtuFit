@@ -430,7 +430,7 @@ async def photo_processing(message: Message):
 
 
 BLENDER_EXECUTABLE = r'C:\Program Files\Blender 4.4\blender.exe'  # Путь к Blender
-BLENDER_SCRIPT = 'blender_script.py'  # Путь к вашему скрипту
+BLENDER_SCRIPT = 'blender2_script.py'  # Путь к вашему скрипту
 RENDER_OUTPUT_DIR = 'renders'  # Директория для временных файлов
 
 
