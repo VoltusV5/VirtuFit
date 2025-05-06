@@ -232,7 +232,9 @@ async def start_form(message: Message, state: FSMContext):
 
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
     await message.answer(
-        text="Укажите ваш пол", 
+        text="👋 Привет! Давай знакомиться! Какой у тебя пол?\n\n"
+"➤ Нажми «Мужской» или «Женский».\n\n"
+"✨ Не стесняйся, я не расскажу! А если захочешь начать заново — /cancel.\n", 
         reply_markup=markup)
     await state.set_state(FSMform.gender)
 
@@ -241,87 +243,110 @@ async def gender_done(callback: CallbackQuery, state: FSMContext):
     await state.update_data(gender=callback.data)
 
     await callback.message.delete()
-    await callback.message.answer("Спасибо!!\nТеперь введите пожалуйста размер рост в САНТИМЕТРАХ (см).")
+    await callback.message.answer("📏 Твой рост в см? Не приуменьшай, я верю в тебя!\n\n"
+"➤ Пример: *175*.\n\n"
+"⚠️ Если запутался — команда /cancel !")
     await state.set_state(FSMform.height)
 
 @dp.message(StateFilter(FSMform.gender))
 async def gender_error(message: Message):
-    await message.answer("Пожалуйста, пользуйтесь кнопками, при выборе пола.\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
+    await message.answer("😅 Ой, я тебя не понял! Давай еще разок: «Мужской» или «Женский»?\n\n"
+"➤ P.S. Всегда можно сбежать через /cancel!")
 
 @dp.message(StateFilter(FSMform.height), control)
 async def height_done(ms:Message, state: FSMContext):
     await state.update_data(height=int(ms.text))
-    await ms.answer("Отлично!\nТеперь введите размер груди в обхвате в САНТИМЕТРАХ (см)")
+    await ms.answer("Отлично!\n📦 Теперь измерь грудь (по самой широкой части в обхвате)!\n\n"
+                    "➤ Напиши число, например: *98*. Это останется между нами 🤫\n\n"
+                    "⚠️ Застрял? Смело пиши /cancel!")
     await state.set_state(FSMform.chest)
 
 @dp.message(StateFilter(FSMform.height))
 async def height_error(ms:Message):
-     await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
+     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
     
 #Обрабатываем ввод размеров обхвата груди(Продумать ограничения бы).
 @dp.message(StateFilter(FSMform.chest), control)
 async def chest_done(message:Message, state: FSMContext):
     await state.update_data(chest=int(message.text))
-    await message.answer("Отлично!\nТеперь введите размер талии в САНТИМЕТРАХ (см)")
+    await message.answer("🎀 А теперь талия! Введи обхват в см (только честно!)\n\n"
+                         "➤ Пример: *72*. Я не сужу, я помогаю 😉\n\n"
+                         "⚠️ Если что-то пошло не так — /cancel спасет!")
     await state.set_state(FSMform.waist)
 
 @dp.message(StateFilter(FSMform.chest))
 async def chest_error(ms: Message):
-    await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
-
+    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+    
 @dp.message(StateFilter(FSMform.waist), control)
 async def waist_done(ms: Message, state: FSMContext):
     await state.update_data(waist=int(ms.text))
-    await ms.answer("Отлично!\nТеперь введите размер бёдер в САНТИМЕТРАХ (см)")
+    await ms.answer("🍑 Время для секретных данных! Обхват *одного* бедра в см?\n\n"
+                    "➤ Например: *65*. Никто не увидит, кроме меня!\n\n"
+                    "⚠️ Хочешь переделать? Жми /cancel!")
     await state.set_state(FSMform.hips)
 
 
 @dp.message(StateFilter(FSMform.waist))
 async def waist_error(ms: Message):
-    await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
-
+    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+    
 @dp.message(StateFilter(FSMform.hips),control)
 async def hips_done(ms: Message, state: FSMContext):
     await state.update_data(hips=int(ms.text))
-    await ms.answer("Отлично!\nТеперь введите ширину плечь в САНТИМЕТРАХ (см)")
+    await ms.answer("🏋️ Теперь плечи! Измерь расстояние между косточками (в см).\n\n"
+                    "➤ Совет: можно использовать рубашку для точности 👕\n\n"
+                    "⚠️ Устал? /cancel — и мы прервёмся")
     await state.set_state(FSMform.shoulder_width)
 
 @dp.message(StateFilter(FSMform.hips))
 async def hips_error(ms: Message):
-    await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
-
+    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
 
 @dp.message(StateFilter(FSMform.shoulder_width), control)
 async def sw_done(ms: Message, state: FSMContext):
     await state.update_data(shoulder_width=int(ms.text))
-    await ms.answer("Отлично!\nТеперь введите рост в САНТИМЕТРАХ (см)")
+    await ms.answer("🧣 Обхват шеи! Да-да, это важно для идеальной рубашки!\n\n"
+                    "➤ Пример: *38*.\n\n"
+                    "⚠️ Если надоело — /cancel всегда поможет!")
     await state.set_state(FSMform.neck)
 
 @dp.message(StateFilter(FSMform.shoulder_width))
 async def sw_error(ms: Message):
-    await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
-
+    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+    
 
 @dp.message(StateFilter(FSMform.neck), control)
 async def neck_done(ms:Message, state: FSMContext):
     await state.update_data(neck=int(ms.text))
-    await ms.answer("Отлично!\nТеперь введите вес в КИЛЛОГРАММАХ (кг)")
+    await ms.answer("⚖️ Сколько весишь? Только честно (я не расскажу никому)!\n\n"
+                    "➤ Например: *200*.\n\n"
+                    "⚠️ Если ошибся — жми /cancel!")
     await state.set_state(FSMform.massa)
 
 @dp.message(StateFilter(FSMform.neck))
 async def neck_error(ms:Message):
-     await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
-    
+     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+     
 @dp.message(StateFilter(FSMform.massa),control)
 async def massa_done(ms:Message, state: FSMContext):
     await state.update_data(massa=float(ms.text))
-    await ms.answer("Отлично!\nТеперь введите длинну рук в САНТИМЕТРАХ (см)")
+    await ms.answer("🦾 Финальный рывок! Длина руки от плеча до запястья (в см).\n\n"
+                    "➤ Пример: *58*. Ты почти у цели! 🚀\n\n"
+                    "⚠️ Если что-то не так — /cancel исправит всё!")
     await state.set_state(FSMform.len_arm)
 
 @dp.message(StateFilter(FSMform.massa))
 async def massa_error(ms:Message):
-     await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
- 
+     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+     
 @dp.message(StateFilter(FSMform.len_arm), control)
 async def len_arm_done(ms:Message, state: FSMContext):
     await state.update_data(len_arm=float(ms.text))
@@ -329,7 +354,8 @@ async def len_arm_done(ms:Message, state: FSMContext):
     db = get_db()
     data = await state.get_data()
     if data.get('gender') == 'male':
-        await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!")
+        await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!\n\n" \
+    "Свои размеры вы можете увидеть, нажав на кнопку:\n<Мои размеры>")
         person = db.query(Person).filter(Person.id==ms.from_user.id).first()
         person.gender = data.get('gender')
         person.chest = data.get('chest')
@@ -344,19 +370,20 @@ async def len_arm_done(ms:Message, state: FSMContext):
         db.close()
         await state.clear()
     else:
-        await ms.answer("Отлично!!! Осталось ввести последний параметр. \n Введите размер груди.")
+        await ms.answer("Отлично!!! Осталось ввести последний параметр. \n Введите размер груди(я никому не расскажу).")
         await state.set_state(FSMform.chest_girl)
 
   
 @dp.message(StateFilter(FSMform.len_arm))
 async def massa_error(ms:Message):
-    await ms.answer("Введите корректные данные\n\nЕсли хотите прервать заполнение размеров - отправьте команде /cancel")
-
+    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n"
+"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+    
 @dp.message(StateFilter(FSMform.chest_girl), control)
 async def chest_girl(ms:Message, state:FSMContext):
     await state.update_data(chest_girl=int(ms.text))
     await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!\n\n" \
-    "Свои размеры вы можете увидеть, нажав на кнопку <Мои размеры>")
+    "Свои размеры вы можете увидеть, нажав на кнопку:\n<Мои размеры>")
     db = get_db()
     data = await state.get_data()
     person = db.query(Person).filter(Person.id==ms.from_user.id).first()
