@@ -20,11 +20,11 @@ class Person(Base):
         )
     photo = Column(Boolean)
     gender = Column(String ) #Пол
+    height = Column(Integer) #Рост
     chest = Column(Integer ) #Обхват груди
     waist = Column(Integer) #Талия
     hips = Column(Integer ) #Бёдра
     shoulder_width = Column(Integer) #ширина плучь
-    height = Column(Integer) #Рост
     chest_girl = Column(Integer ) # Размер груди
     neck = Column(Integer ) #Шея
     massa = Column(Float )

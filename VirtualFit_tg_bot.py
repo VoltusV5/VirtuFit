@@ -4,123 +4,17 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state,State,StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
-from aiogram.types import Message, KeyboardButton, BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile
+from aiogram.types import Message, BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile
 from dotenv import load_dotenv 
 from sqlalchemy.orm import Session
+from control_size import control
+from buttons import kb_builder1, kb_builder_menu, kb_builder_payments, kb_builder
 import time
 from database import *
 import os
 
-async def control(message: Message, state: FSMContext):
-     data = await state.get_data()
-     if data.get('gender') != None and data.get('gender') == 'male':
-        if data.get('height') == None:
-            return 90<int(message.text)<210
-        if data.get('height') <= 150:
-            if data.get('chest') == None:
-                return 56<int(message.text)<90
-            if data.get('waist') == None:
-                return 50<int(message.text)<70
-            if data.get('hips') == None:
-                return 50<int(message.text)<70
-            if data.get('shoulder_width') != None:
-                return 10<int(message.text)<40
-            if data.get('neck') == None:
-                return 20<int(message.text)<35
-            if data.get('massa') == None:
-                return 12<int(message.text)<50
-            if data.get('len_arm') == None:
-                return 20<int(message.text)<50
-        elif data.get('height') <= 175:
-            if data.get('chest') == None:
-                return 90<int(message.text)<110
-            if data.get('waist') == None:
-                return 70<int(message.text)<80
-            if data.get('hips') == None:
-                return 80<int(message.text)<100
-            if data.get('shoulder_width') != None:
-                return 40<int(message.text)<50
-            if data.get('neck') == None:
-                return 35<int(message.text)<43
-            if data.get('massa') == None:
-                return 50<int(message.text)<150
-            if data.get('len_arm') == None:
-                return 50<int(message.text)<61
-        else:
-            if data.get('chest') == None:
-                return 88<int(message.text)<130
-            if data.get('waist') == None:
-                return 80<int(message.text)<100
-            if data.get('hips') == None:
-                return 45<int(message.text)<75
-            if data.get('shoulder_width') == None:
-                return 35<int(message.text)<60
-            if data.get('neck') == None:
-                return 30<int(message.text)<55
-            if data.get('massa') == None:
-                return 50<int(message.text)<200
-            if data.get('len_arm') == None:
-                return 50<int(message.text)<75   
-     else:
-         if data.get('gender') != None:
-            if data.get('height') == None:
-                return 90<int(message.text)<185
-            if data.get('height') <= 150:
-                if data.get('chest') == None:
-                    return 56<int(message.text)<90
-                if data.get('waist') == None:
-                    return 50<int(message.text)<70
-                if data.get('hips') == None:
-                    return 50<int(message.text)<70
-                if data.get('shoulder_width') != None:
-                    return 10<int(message.text)<40
-                if data.get('chest_girl') != None:
-                    return 40<int(message.text)<70
-                if data.get('neck') == None:
-                    return 20<int(message.text)<35
-                if data.get('massa') == None:
-                    return 12<int(message.text)<50
-                if data.get('len_arm') == None:
-                    return 20<int(message.text)<50
-            elif data.get('height') <= 165:
-                if data.get('chest') == None:
-                    return 80<int(message.text)<115
-                if data.get('waist') == None:
-                    return 60<int(message.text)<85
-                if data.get('hips') == None:
-                    return 80<int(message.text)<120
-                if data.get('shoulder_width') != None:
-                    return 25<int(message.text)<40
-                if data.get('chest_girl') != None:
-                    return 70<int(message.text)<105
-                if data.get('neck') == None:
-                    return 25<int(message.text)<42
-                if data.get('massa') == None:
-                    return 40<int(message.text)<150
-                if data.get('len_arm') == None:
-                    return 30<int(message.text)<75
-            else:
-                if data.get('chest') == None:
-                    return 85<int(message.text)<130
-                if data.get('waist') == None:
-                    return 60<int(message.text)<95
-                if data.get('hips') == None:
-                    return 90<int(message.text)<135
-                if data.get('shoulder_width') == None:
-                    return 25<int(message.text)<40
-                if data.get('chest_girl') == None:
-                    return 70<int(message.text)<105
-                if data.get('neck') == None:
-                    return 27<int(message.text)<42
-                if data.get('massa') == None:
-                    return 50<int(message.text)<200
-                if data.get('len_arm') == None:
-                    return 35<int(message.text)<75  
-              
          
         
-
 Base.metadata.create_all(bind=engine)
 
 def get_db():
@@ -138,20 +32,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=storage)
 
-#Создём кнопки
-kb_builder1 = ReplyKeyboardBuilder()
-kb_builder_menu = ReplyKeyboardBuilder()
-buttons_1 = [KeyboardButton(text="Футболка"), KeyboardButton(text="Кофта")]
-buttons_menu = [KeyboardButton(text="Подписка"), 
-                KeyboardButton(text="Ввести размеры"), 
-                KeyboardButton(text="Что умеешь?"), 
-                KeyboardButton(text="Примерить одежду"),
-                KeyboardButton(text="Реферальная программа"),
-                KeyboardButton(text="Сотрудничество"),
-                KeyboardButton(text="Мои размеры")
-                ]
-kb_builder1.row(*buttons_1, width=2)
-kb_builder_menu.row(*buttons_menu, width=3)
 
 class FSMform(StatesGroup):
     gender = State() #Пол
@@ -176,13 +56,6 @@ async def set_main_menu(bot:Bot):
 
 dp.startup.register(set_main_menu)
 
-
-
-kb_builder = ReplyKeyboardBuilder()
-
-button = [KeyboardButton(text="Футболка"), KeyboardButton(text="Кофта")]
-
-kb_builder.row(*button, width=2)
 
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
@@ -530,8 +403,17 @@ async def answer(message:Message):
             os.remove(output_path)
 
 
+@dp.message(F.text == "💰Подписка💰", StateFilter(default_state))
+async def pay(message: Message):
+    await message.answer("Выбери режим!", reply_markup=kb_builder_payments.as_markup(resize_keyboard=True, one_time_keyboard=True))
 
+@dp.message(F.text == "🙂Пользователь🙂", StateFilter(default_state))
+async def b2c(message: Message):
+    await message.answer("Тут что нибудь появится! Скоро...")
 
+@dp.message(F.text == "💼Бизнес💼", StateFilter(default_state))
+async def b2b(message: Message):
+    await message.answer("Тут что нибудь появится! Скоро...")
 
 
 @dp.message(F.text == "Что умеешь?", StateFilter(default_state))
