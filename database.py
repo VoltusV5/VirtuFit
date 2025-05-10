@@ -1,6 +1,7 @@
 from sqlalchemy import Column, create_engine, Integer, Boolean,String,Float
 from sqlalchemy import Column, create_engine, Integer, Boolean
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from sqlalchemy.orm import Session
 
 SQL_URL = "sqlite:///./app_sql.db"
 engine = create_engine(
@@ -25,11 +26,11 @@ class Person(Base):
     waist = Column(Integer) #Талия
     hips = Column(Integer ) #Бёдра
     shoulder_width = Column(Integer) #ширина плучь
-    chest_girl = Column(Integer ) # Размер груди
-    neck = Column(Integer ) #Шея
-    massa = Column(Float )
     len_arm = Column(Integer ) #Длинна рук
 
 
 SessionLocal = sessionmaker(autoflush=False,bind=engine)
 
+def get_db():
+    db:Session = SessionLocal()
+    return db

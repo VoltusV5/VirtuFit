@@ -4,7 +4,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state,State,StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import Message, BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile
+from aiogram.types import Message, BotCommand, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile, InputFile
 from dotenv import load_dotenv 
 from sqlalchemy.orm import Session
 from control_size import control
@@ -91,7 +91,7 @@ async def cancel_form(message: Message, state: FSMContext):
     await message.answer("Вы вышли из заполнения размеров")
     await state.clear()
 
-@dp.message(F.text == 'Ввести размеры', StateFilter(default_state))
+@dp.message(F.text == '📏Ввести размеры📏', StateFilter(default_state))
 async def start_form(message: Message, state: FSMContext):
     male_button = InlineKeyboardButton(
         text='Мужской ♂',
@@ -129,35 +129,38 @@ async def gender_error(message: Message):
 @dp.message(StateFilter(FSMform.height), control)
 async def height_done(ms:Message, state: FSMContext):
     await state.update_data(height=int(ms.text))
-    await ms.answer("Отлично!\n📦 Теперь измерь грудь (по самой широкой части в обхвате)!\n\n"
-                    "➤ Напиши число, например: *98*. Это останется между нами 🤫\n\n"
+    photo = FSInputFile(r"photo\обхват груди.png")
+    await bot.send_photo(ms.from_user.id, photo=photo, caption="Отлично!\n📦 Теперь измерь грудь (по самой широкой части в обхвате)!\n\n"
+                    "➤ Напиши число, например: 98. Это останется между нами 🤫\n\n"
                     "⚠️ Застрял? Смело пиши /cancel!")
     await state.set_state(FSMform.chest)
 
 @dp.message(StateFilter(FSMform.height))
 async def height_error(ms:Message):
      await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+"➤ Пример: 85. И помни: /cancel — твой спасательный круг!")
     
 #Обрабатываем ввод размеров обхвата груди(Продумать ограничения бы).
 @dp.message(StateFilter(FSMform.chest), control)
 async def chest_done(message:Message, state: FSMContext):
     await state.update_data(chest=int(message.text))
-    await message.answer("🎀 А теперь талия! Введи обхват в см (только честно!)\n\n"
-                         "➤ Пример: *72*. Я не сужу, я помогаю 😉\n\n"
+    photo = FSInputFile(r"photo\талия.png")
+    await bot.send_photo(chat_id=message.from_user.id, photo=photo, caption="🎀 А теперь талия! Введи размер в обхвате в см (только честно!)\n\n"
+                         "➤ Пример: 72. Я не сужу, я помогаю 😉\n\n"
                          "⚠️ Если что-то пошло не так — /cancel спасет!")
     await state.set_state(FSMform.waist)
 
 @dp.message(StateFilter(FSMform.chest))
 async def chest_error(ms: Message):
     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+"➤ Пример: 85. И помни: /cancel — твой спасательный круг!")
     
 @dp.message(StateFilter(FSMform.waist), control)
 async def waist_done(ms: Message, state: FSMContext):
     await state.update_data(waist=int(ms.text))
-    await ms.answer("🍑 Время для секретных данных! Обхват *одного* бедра в см?\n\n"
-                    "➤ Например: *65*. Никто не увидит, кроме меня!\n\n"
+    photo = FSInputFile(r"photo\Бёдра.png")
+    await bot.send_photo(chat_id=ms.from_user.id, photo=photo, caption="🍑 Время для секретных данных! Обхват *одного* бедра в см?\n\n"
+                    "➤ Например: 65. Никто не увидит, кроме меня!\n\n"
                     "⚠️ Хочешь переделать? Жми /cancel!")
     await state.set_state(FSMform.hips)
 
@@ -165,12 +168,13 @@ async def waist_done(ms: Message, state: FSMContext):
 @dp.message(StateFilter(FSMform.waist))
 async def waist_error(ms: Message):
     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+"➤ Пример: 85. И помни: /cancel — твой спасательный круг!")
     
 @dp.message(StateFilter(FSMform.hips),control)
 async def hips_done(ms: Message, state: FSMContext):
     await state.update_data(hips=int(ms.text))
-    await ms.answer("🏋️ Теперь плечи! Измерь расстояние между косточками (в см).\n\n"
+    photo = FSInputFile(r"photo\ширина плеч.png")
+    await bot.send_photo(chat_id=ms.from_user.id, photo=photo, caption="🏋️ Теперь плечи! Измерь расстояние между косточками (в см).\n\n"
                     "➤ Совет: можно использовать рубашку для точности 👕\n\n"
                     "⚠️ Устал? /cancel — и мы прервёмся")
     await state.set_state(FSMform.shoulder_width)
@@ -178,87 +182,33 @@ async def hips_done(ms: Message, state: FSMContext):
 @dp.message(StateFilter(FSMform.hips))
 async def hips_error(ms: Message):
     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+"➤ Пример: 85. И помни: /cancel — твой спасательный круг!")
 
 @dp.message(StateFilter(FSMform.shoulder_width), control)
 async def sw_done(ms: Message, state: FSMContext):
     await state.update_data(shoulder_width=int(ms.text))
-    await ms.answer("🧣 Обхват шеи! Да-да, это важно для идеальной рубашки!\n\n"
-                    "➤ Пример: *38*.\n\n"
+    photo = FSInputFile(r"photo\длина рук.png")   
+    await bot.send_photo(chat_id=ms.from_user.id, photo=photo, caption="🧣 Длинна рук! Да-да, это важно для идеальной рубашки!\n\n"
+                    "➤ Пример: 38.\n\n"
                     "⚠️ Если надоело — /cancel всегда поможет!")
-    await state.set_state(FSMform.neck)
+    await state.set_state(FSMform.len_arm)
 
 @dp.message(StateFilter(FSMform.shoulder_width))
 async def sw_error(ms: Message):
     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
+"➤ Пример: 85. И помни: /cancel — твой спасательный круг!")
     
 
-@dp.message(StateFilter(FSMform.neck), control)
-async def neck_done(ms:Message, state: FSMContext):
-    await state.update_data(neck=int(ms.text))
-    await ms.answer("⚖️ Сколько весишь? Только честно (я не расскажу никому)!\n\n"
-                    "➤ Например: *200*.\n\n"
-                    "⚠️ Если ошибся — жми /cancel!")
-    await state.set_state(FSMform.massa)
 
-@dp.message(StateFilter(FSMform.neck))
-async def neck_error(ms:Message):
-     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
-     
-@dp.message(StateFilter(FSMform.massa),control)
-async def massa_done(ms:Message, state: FSMContext):
-    await state.update_data(massa=float(ms.text))
-    await ms.answer("🦾 Финальный рывок! Длина руки от плеча до запястья (в см).\n\n"
-                    "➤ Пример: *58*. Ты почти у цели! 🚀\n\n"
-                    "⚠️ Если что-то не так — /cancel исправит всё!")
-    await state.set_state(FSMform.len_arm)
-
-@dp.message(StateFilter(FSMform.massa))
-async def massa_error(ms:Message):
-     await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
-     
 @dp.message(StateFilter(FSMform.len_arm), control)
 async def len_arm_done(ms:Message, state: FSMContext):
     await state.update_data(len_arm=float(ms.text))
     
     db = get_db()
     data = await state.get_data()
-    if data.get('gender') == 'male':
-        await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!\n\n" \
+    photo = FSInputFile(r"photo\победа.jpg")
+    await bot.send_photo(chat_id=ms.from_user.id, photo=photo, caption="Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!\n\n"
     "Свои размеры вы можете увидеть, нажав на кнопку:\n<Мои размеры>")
-        person = db.query(Person).filter(Person.id==ms.from_user.id).first()
-        person.gender = data.get('gender')
-        person.chest = data.get('chest')
-        person.waist = data.get('waist')
-        person.hips = data.get('hips')
-        person.shoulder_width = data.get('shoulder_width')
-        person.height = data.get('height')
-        person.neck = data.get('neck')
-        person.massa = data.get('massa')
-        person.len_arm = data.get('len_arm')
-        db.commit()
-        db.close()
-        await state.clear()
-    else:
-        await ms.answer("Отлично!!! Осталось ввести последний параметр. \n Введите размер груди(я никому не расскажу).")
-        await state.set_state(FSMform.chest_girl)
-
-  
-@dp.message(StateFilter(FSMform.len_arm))
-async def massa_error(ms:Message):
-    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n"
-"➤ Пример: *85*. И помни: /cancel — твой спасательный круг!")
-    
-@dp.message(StateFilter(FSMform.chest_girl), control)
-async def chest_girl(ms:Message, state:FSMContext):
-    await state.update_data(chest_girl=int(ms.text))
-    await ms.answer("Поздравляю, вы заполнили параметры, теперь можно создавать 3д модель!!!!\n\n" \
-    "Свои размеры вы можете увидеть, нажав на кнопку:\n<Мои размеры>")
-    db = get_db()
-    data = await state.get_data()
     person = db.query(Person).filter(Person.id==ms.from_user.id).first()
     person.gender = data.get('gender')
     person.chest = data.get('chest')
@@ -266,44 +216,47 @@ async def chest_girl(ms:Message, state:FSMContext):
     person.hips = data.get('hips')
     person.shoulder_width = data.get('shoulder_width')
     person.height = data.get('height')
-    person.neck = data.get('neck')
-    person.massa = data.get('massa')
     person.len_arm = data.get('len_arm')
-    person.chest_girl = data.get('chest_girl')
     db.commit()
     db.close()
     await state.clear()
 
+  
+@dp.message(StateFilter(FSMform.len_arm))
+async def massa_error(ms:Message):
+    await ms.answer("❌ Кажется, что-то не то! Попробуй еще раз!\n"
+"➤ Пример: 85. И помни: /cancel — твой спасательный круг!")
+    
 
-@dp.message(F.text=="Мои размеры", StateFilter(default_state))
+
+@dp.message(F.text=="📝Мои размеры📝", StateFilter(default_state))
 async def size_person(ms:Message):
     db = get_db()
     person = db.get(Person, ms.from_user.id)
     if person.gender == 'female':
-        await ms.answer(
-            f'Пол: Женский\n'
+        photo = FSInputFile(r"photo\размеры.jpg")
+        await bot.send_photo(chat_id=ms.from_user.id, photo=photo, 
+        caption=f'Пол: Женский\n'
             f'Обхват груди: {person.chest} см\n'
             f'Талия: {person.waist} см\n'
             f'Бёдра: {person.hips} см\n'
             f'Ширина плечь: {person.shoulder_width} см\n'
             f'Рост: {person.height} см\n'
-            f'Размер груди: {person.chest_girl}\n'
-            f'Шея: {person.neck} см\n'
-            f'Масса: {person.massa} кг\n'
+            f'Длинна рук: {person.len_arm} см'
+            )
+    elif person.gender == "male":
+        photo = FSInputFile(r"photo\размеры.jpg")
+        await bot.send_photo(chat_id=ms.from_user.id, photo=photo, 
+        caption=f'Пол: Мужской\n'
+            f'Обхват груди: {person.chest} см\n'
+            f'Талия: {person.waist} см\n'
+            f'Бёдра: {person.hips} см\n'
+            f'Ширина плечь: {person.shoulder_width} см\n'
+            f'Рост: {person.height} см\n'
             f'Длинна рук: {person.len_arm} см'
             )
     else:
-        await ms.answer(
-            f'Пол: Мужской\n'
-            f'Обхват груди: {person.chest} см\n'
-            f'Талия: {person.waist} см\n'
-            f'Бёдра: {person.hips} см\n'
-            f'Ширина плечь: {person.shoulder_width} см\n'
-            f'Рост: {person.height} см\n'
-            f'Шея: {person.neck} см\n'
-            f'Масса: {person.massa} кг\n'
-            f'Длинна рук: {person.len_arm} см'
-            )
+        await ms.answer("Вы не ввели свои размеры😔.\nВведите их и мы примерим одежду!😉")
     db.close()
 
 
@@ -328,20 +281,26 @@ async def photo_processing(message: Message):
                          reply_markup= kb_builder.as_markup(resize_keyboard=True, one_time_keyboard=True))
 
 
-
+#ВОТ ТУТ====================================================
 BLENDER_EXECUTABLE = r'C:\Program Files\Blender 4.4\blender.exe'  # Путь к Blender
+#===========================================================
 BLENDER_SCRIPT = 'blender2_script.py'  # Путь к вашему скрипту
 RENDER_OUTPUT_DIR = 'renders'  # Директория для временных файлов
 
 
-async def run_blender_async(output_path: str) -> bool:
+async def run_blender_async(output_path: str, person) -> bool:
     """Асинхронно запускает Blender с указанным скриптом"""
     command = [
         BLENDER_EXECUTABLE,
         '--background',
         '--python', BLENDER_SCRIPT,
         '--',  # Разделитель для аргументов скрипта
-        output_path
+        output_path, 
+        str(person.gender),
+        str((person.chest + 20) / 100),
+        str((person.waist + 20) / 100),
+        str((person.hips + 45) / 100),
+        str((person.shoulder_width + 30) / 100)
     ]
     
     process = await asyncio.create_subprocess_exec(
@@ -362,63 +321,84 @@ def is_file_available(filepath: str) -> bool:
         return False
 
 
-@dp.message(F.text=="Примерить одежду", StateFilter(default_state))
+@dp.message(F.text=="🥼Примерить одежду🔧", StateFilter(default_state))
 async def answer(message:Message):
     """Обработчик команды запуска рендеринга"""
-    # Создаем уникальное имя файла
-    os.makedirs(RENDER_OUTPUT_DIR, exist_ok=True)
-    filename = f"{message.from_user.id}.mp4"
-    output_dir = 'D:\\project\\VirtuFit\\video'
-    output_path = os.path.join(output_dir, filename)
-    
-    await message.reply("🚀 Начинаю рендеринг...")
-    
-    try:
-        success = await run_blender_async(output_path)
-        if not success:
-            raise Exception("Ошибка в процессе рендеринга")
-        
 
-        for _ in range(10):
-            if os.path.exists(output_path) and is_file_available(output_path):
-                break
-            await asyncio.sleep(1)
-        else:
-            raise Exception("Файл не освободился после рендеринга")
-        
-
-        if os.path.exists(output_path):
-            video = FSInputFile(output_path)
-            await bot.send_video(
-                chat_id=message.chat.id, 
-                video=video
-                                 )
-            os.remove(output_path)
-        else:
-            await message.reply("❌ Файл не был создан")
+    db = get_db()
+    person =  db.get(Person, message.from_user.id)
+    if person.gender != "female":
+        if person.height!=None:
+            # Создаем уникальное имя файла
+            os.makedirs(RENDER_OUTPUT_DIR, exist_ok=True)
+            filename = f"{message.from_user.id}.mp4"
+            output_dir = 'D:\\project\\VirtuFit\\video' #========ВОТ ТУТ==============
+            output_path = os.path.join(output_dir, filename)
             
-    except Exception as e:
-        await message.reply(f"⚠️ Ошибка: {str(e)}")
-        if os.path.exists(output_path):
-            os.remove(output_path)
+            await message.reply("🚀 Начинаю рендеринг...")
+            
+            try:
+                success = await run_blender_async(output_path, person)
+                if not success:
+                    video = FSInputFile(r"sos\video.mp4")
+                    await bot.send_video(chat_id=message.from_user.id,video=video)
+                
+
+                for _ in range(10):
+                    if os.path.exists(output_path) and is_file_available(output_path):
+                        break
+                    await asyncio.sleep(1)
+                else:
+                    video = FSInputFile(r"sos\video.mp4")
+                    await bot.send_video(chat_id=message.from_user.id,video=video)
+                
+
+                if os.path.exists(output_path):
+                    video = FSInputFile(output_path)
+                    await bot.send_video(
+                        chat_id=message.chat.id, 
+                        video=video
+                                        )
+                    os.remove(output_path)
+                else:
+                    video = FSInputFile(r"sos\video.mp4")
+                    await bot.send_video(chat_id=message.from_user.id,video=video)
+                    
+            except Exception as e:
+                video = FSInputFile(r"sos\video.mp4")
+                await bot.send_video(chat_id=message.from_user.id,video=video)
+                if os.path.exists(output_path):
+                    os.remove(output_path)
+        else:
+            await message.answer("Вы не ввели свои размеры😔.\nВведите их и мы примерим одежду!😉")
+    else:
+        video = FSInputFile(r"video\woman.mp4")
+        await bot.send_video(chat_id=message.from_user.id,video=video)
+
+# @dp.message(F.text == "💰Подписка💰", StateFilter(default_state))
+# async def pay(message: Message):
+#     await message.answer("Выбери режим!", reply_markup=kb_builder_payments.as_markup(resize_keyboard=True, one_time_keyboard=True))
+
+# @dp.message(F.text == "🙂Пользователь🙂", StateFilter(default_state))
+# async def b2c(message: Message):
+#     await message.answer("Тут что нибудь появится! Скоро...")
+
+# @dp.message(F.text == "💼Бизнес💼", StateFilter(default_state))
+# async def b2b(message: Message):
+#     await message.answer("Тут что нибудь появится! Скоро...")
 
 
-@dp.message(F.text == "💰Подписка💰", StateFilter(default_state))
-async def pay(message: Message):
-    await message.answer("Выбери режим!", reply_markup=kb_builder_payments.as_markup(resize_keyboard=True, one_time_keyboard=True))
-
-@dp.message(F.text == "🙂Пользователь🙂", StateFilter(default_state))
-async def b2c(message: Message):
-    await message.answer("Тут что нибудь появится! Скоро...")
-
-@dp.message(F.text == "💼Бизнес💼", StateFilter(default_state))
-async def b2b(message: Message):
-    await message.answer("Тут что нибудь появится! Скоро...")
-
-
-@dp.message(F.text == "Что умеешь?", StateFilter(default_state))
+@dp.message(F.text == "ⓘЧто умеешь?ⓘ", StateFilter(default_state))
 async def info(ms:Message):
-    await ms.answer("Привет! Я бот VirtualFit.\n\nЯ могу помочь тебе примерить одежду.\nСначала введи свои размеры, потом сможешь отправить мне фотографию той одежды, которую хочешь примерить, а я пришлю тебе видео на которой модель с твоими размерами в этой одежде!")
+    photo = FSInputFile(r"photo\памятка.png")
+    await bot.send_photo(ms.from_user.id, photo=photo, 
+                     caption="Привет! Я бот VirtualFit.\n\n"
+                     "Для пользователей🙂:\n\n"
+                     "1. Введи свои размеры📏\n"
+                     "2. Нажимай на кнопку <Примерить одежду> и будет магия!!🔮🪄\n\n"
+                     "Для бизнеса💼:\n"
+                     "1. Нажмите на кнопку <Бизнес> в меню!🆙")
+
 
 @dp.message(F.text == "Футболка", StateFilter(default_state))
 async def t_short(message: Message):
