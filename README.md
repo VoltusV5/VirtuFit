@@ -1,5 +1,4 @@
-# 👗 VirtualFit — 3D-примерка одежды на основе параметров тела
-
+# 👗 VirtualFit — 3D Clothing Try-On Based on Body Measurements
 
 <table>
   <tr>
@@ -12,95 +11,85 @@
   </tr>
 </table>
 
-
-
-**VirtualFit** — это программное обеспечение и веб-сервис для генерации 3D-моделей одежды на основе пользовательских параметров. Сервис ориентирован на разработчиков, интеграторов и технические команды, создающие решения для fashion-ретейла, маркетплейсов и визуализации одежды.
-
----
-
-## 🚀 О проекте
-
-VirtualFit — это backend- и frontend-решение, автоматизирующее процесс виртуальной примерки одежды. Пользователь взаимодействует с Telegram-ботом или веб-интерфейсом, а на сервере запускается пайплайн, включающий нейросеть и 3D-визуализацию в Blender.
+**VirtualFit** is a software and web service for generating 3D clothing models based on user body parameters.  
+The service is aimed at developers, integrators, and technical teams creating solutions for fashion retail, marketplaces, and garment visualization.
 
 ---
 
-## 🧱 Архитектура
+## 🚀 About the Project
 
-Пользователь → Telegram-бот / Web UI
-
-Backend (Python, FastAPI)
-
-Нейросеть IMAGDressing → Blender Pipeline
-
-Видео / Preview
-
-
+VirtualFit is a backend and frontend solution that automates the virtual try-on process.  
+Users interact via a Telegram bot or web interface, while the server runs a pipeline that includes a neural network and 3D visualization in Blender.
 
 ---
 
-## ⚙️ Технологии
+## 🧱 Architecture
 
-- 🧠 **Нейросеть IMAGDressing** — автоматическая примерка одежды на цифрового аватара
-- 🧩 **Blender API** — генерация 3D-модели и рендеринг видео / GLTF
-- 🤖 **Telegram Bot API** — взаимодействие с пользователем через бота
+**User → Telegram Bot / Web UI → Backend (Python, FastAPI) → IMAGDressing Neural Network → Blender Pipeline → Video / Preview**
 
 ---
 
-## 📦 Возможности
+## ⚙️ Technologies
 
-- Загрузка фото одежды и параметров тела
-- Генерация 3D-модели с одеждой и вращающимся видео
-- Экспорт в `.mp4` и другие форматы
-- Web API для интеграции с другими платформами
-
----
-
-## 🧪 MVP и статус
-
-- ✅ Протестирован MVP на небольшой группе пользователей
-- ✅ Получены положительные отзывы
-- ⏳ Ведётся разработка Web-интерфейса и оптимизация пайплайна
+- 🧠 **IMAGDressing Neural Network** — automatic clothing try-on on a digital avatar  
+- 🧩 **Blender API** — 3D model generation and video/GLTF rendering  
+- 🤖 **Telegram Bot API** — user interaction via Telegram
 
 ---
 
-## 📈 Планы развития
+## 📦 Features
 
-- 📱 Создание нативного мобильного приложения
-- 🌐 Интеграция с маркетплейсами через SDK и API
-- 💾 Расширение облачной инфраструктуры
-- 🎯 Оптимизация pipeline для пакетной обработки B2B
+- Upload clothing images and body measurements  
+- Generate a 3D model with clothing and a rotating preview  
+- Export to `.mp4` and other formats  
+- Web API for integration with other platforms
 
 ---
 
+## 🧪 MVP & Status
 
-## 💬 Контакты
-Telegram: @VitualFit_bot
+- ✅ MVP tested with a small user group  
+- ✅ Positive feedback received  
+- ⏳ Web interface and pipeline optimization in progress
 
+---
+
+## 📈 Roadmap
+
+- 📱 Develop a native mobile app  
+- 🌐 Integration with marketplaces via SDK and API  
+- 💾 Expand cloud infrastructure  
+- 🎯 Optimize the pipeline for batch B2B processing
+
+---
+
+## 💬 Contact
+
+Telegram: [@VirtualFit_bot](https://t.me/VirtualFit_bot)  
 Email: virtualfit@gmail.com
 
-## 🛠️ Как использовать (базовый пример)
+---
+
+## 🛠️ How to Use (Basic Example)
 
 ```bash
-# Клонировать репозиторий
+# 1. Clone this repository
 git clone https://github.com/your-org/virtualfit.git
 
-# 2. Клонировать IMAGDressing в корень проекта
+# 2. Clone IMAGDressing into the project root
 git clone https://github.com/muzishen/IMAGDressing.git
 
-# 3. Скачать базовые модели из Hugging Face
+# 3. Download base models from Hugging Face
 
-Скачайте файлы отсюда:
+Download the checkpoint files from:  
 📦 https://huggingface.co/feishen29/IMAGDressing
 
-Разместите веса моделей в ckpt в корне проекта. Если такой папки нет - создайте её.
+Place the model weights into the `ckpt` folder in the project root.  
+If the folder doesn’t exist, create it.
 
-
-# 4. Установить зависимости
-
+# 4. Install dependencies
 cd virtualfit
-
 pip install -r requirements.txt
 
-# 5. Запустить backend
+# 5. Run the backend
 python app/VirtualFit_tg_bot.py
-
