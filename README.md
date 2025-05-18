@@ -4,11 +4,11 @@
 <table>
   <tr>
     <td><img src="Github_images/1.JPG" alt="img1" width="80%" /></td>
-    <td><img src="Github_images/2.jpg" alt="img2" width="80%" /></td>
+    <td><img src="Github_images/2.JPG" alt="img2" width="80%" /></td>
   </tr>
   <tr>
-    <td><img src="Github_images/3.jpg" alt="img3" width="80%" /></td>
-    <td><img src="Github_images/4.jpg" alt="img4" width="80%" /></td>
+    <td><img src="Github_images/3.JPG" alt="img3" width="80%" /></td>
+    <td><img src="Github_images/4.JPG" alt="img4" width="80%" /></td>
   </tr>
 </table>
 
