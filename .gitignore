@@ -153,7 +153,6 @@ checkpoints/
 
 # Model files
 *.h5
-*.ckpt
 *.joblib
 
 # Data files
@@ -186,6 +185,6 @@ checkpoints/
 .cache/
 
 testdata/
-output_*/
-ckpt/
+
+
 
