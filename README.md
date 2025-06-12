@@ -68,6 +68,14 @@ Users interact via a Telegram bot or web interface, while the server runs a pipe
 Telegram: [@VirtualFit_bot](https://t.me/VirtualFit_bot)  
 Email: virtualfit@gmail.com
 
+## 👨‍💻 Developers
+
+- Og-Grig: https://github.com/Og-Grig
+- Alex-Doom: https://github.com/Alex-Doom
+- Vagim12: https://github.com/Vagim12
+- Favck: https://github.com/Favck
+- VoltusV: https://github.com/VoltusV5
+
 ---
 
 ## 🛠️ How to Use (Basic Example)
